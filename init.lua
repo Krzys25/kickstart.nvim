@@ -603,7 +603,6 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
         -- rust_analyzer = {},
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -640,6 +639,18 @@ require('lazy').setup({
           end,
           settings = {
             Lua = {},
+          },
+        },
+
+        pyright = {
+          settings = {
+            python = {
+              analysis = {
+                typeCheckingMode = 'standard',
+                autoImportCompletion = true,
+                venvPath = vim.g.python3_host_prog,
+              },
+            },
           },
         },
       }
