@@ -630,7 +630,6 @@ require('lazy').setup({
               analysis = {
                 typeCheckingMode = 'standard',
                 autoImportCompletion = true,
-                venvPath = vim.g.python3_host_prog,
               },
             },
           },
