@@ -345,7 +345,10 @@ do
   -- We first install it from https://github.com/NMAC427/guess-indent.nvim
   -- and then call its `setup()` function to start it with default settings.
   vim.pack.add { gh 'NMAC427/guess-indent.nvim' }
-  require('guess-indent').setup {}
+  require('guess-indent').setup {
+    -- YAML uses ftplugin/yaml.lua to force 2-space expandtab; keep guess-indent off it.
+    filetype_exclude = { 'netrw', 'tutor', 'yaml' },
+  }
 
   -- Here is a more advanced configuration example that passes options to `gitsigns.nvim`
   --
