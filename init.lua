@@ -706,7 +706,7 @@ do
         python = {
           analysis = {
             typeCheckingMode = 'standard',
-            autoImportCompletion = true,
+            autoImportCompletions = true,
           },
         },
       },
