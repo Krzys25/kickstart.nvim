@@ -22,16 +22,20 @@ git branch backup/presync_$(date +%Y%m%d) krzys25_custom_v2   # optional safety 
 git rebase master              # most upstream changes land cleanly because our commits
                                # rarely touch the same lines; the main manual area is
                                # Sections 1-2 (Options/Keymaps) when upstream restructures them
+                               # NOTE: nvim-pack-lock.json is tracked on this branch, so it
+                               # will show up in the rebase if plugins moved since last sync
 git push --force-with-lease origin krzys25_custom_v2
 ```
 When resolving conflicts, always **adopt upstream's structural/renumbering changes** (the `SECTION N:` banners belong to upstream) and re-slot only your content edits into them. Keep this file's section map in sync afterward.
+
+Earlier syncs needed a manual replay onto a fresh `master` (the lazy.nvim→vim.pack migration and the section split moved too much). Now that the two histories have converged, a plain `git rebase master` is the expected path — the 2026-08-26 sync replayed all 13 commits with zero conflicts.
 
 ## Architecture
 
 `init.lua` is organized as **10 numbered `do...end` sections**. Read top-to-bottom; each section is self-contained.
 
 1. **Section 1: Options** — vim options, leaders, diagnostic config.
-2. **Section 2: Keymaps** — basic keymaps and basic autocommands (e.g. highlight-on-yank).
+2. **Section 2: Keymaps & Autocmds** — basic keymaps and basic autocommands (e.g. highlight-on-yank).
 3. **Section 3: Plugin Manager Intro** — `vim.pack` notes and the `PackChanged` build-hook autocommand (handles telescope-fzf-native, LuaSnip, nvim-treesitter post-install steps).
 4. **Section 4: UI / Core UX** — guess-indent, gitsigns, which-key, colorscheme, todo-comments, mini.nvim modules. Icons come from `mini.icons` (mocking `nvim-web-devicons`).
 5. **Section 5: Search & Navigation** — Telescope setup, keymaps, LSP picker mappings.
@@ -48,6 +52,8 @@ When resolving conflicts, always **adopt upstream's structural/renumbering chang
 - **`lua/custom/plugins/`** — Personal plugin additions. The `init.lua` here iterates the directory — following symlinks, and loading symlinked `.lua` files too — and `require`s each `.lua` file (return values are ignored — files run for side effects). Each file is an **imperative script**: it calls `vim.pack.add { 'https://github.com/owner/repo' }` (full URL, since the `gh` helper in init.lua isn't exported) and then `require('plugin').setup{}` or sets relevant `vim.g.*` globals.
 
 - **`ftplugin/yaml.lua`** — Forces 2-space expandtab for YAML and blocks the stock Vim ftplugin/indent scripts via `did_ftplugin`/`did_indent`.
+
+- **`nvim-pack-lock.json`** — Tracked on this branch (upstream leaves it gitignored to avoid churn in the kickstart repo; see `:help vim.pack-lockfile`). It pins the exact plugin revisions, so `vim.pack.update()` produces a reviewable diff and a bad update can be reverted with git. The `.gitignore` entry is commented out — that one-line divergence from `master` is intentional.
 
 ## Common Commands
 
@@ -89,6 +95,8 @@ Enforced by `.stylua.toml` + conform.nvim format-on-save (Lua only):
 - **rustaceanvim owns rust-analyzer**: do not add `rust_analyzer = {}` to the `servers` table in Section 6. `lua/custom/plugins/rustaceanvim.lua` starts the LSP client itself via `vim.g.rustaceanvim`.
 
 - **`vim.g.rustaceanvim` must be set BEFORE `vim.pack.add`** in the custom plugin file, since rustaceanvim reads it on initialization.
+
+- **`mason-lspconfig.setup` must stay**: upstream Section 6 calls `require('mason-lspconfig').setup { automatic_enable = false }` right after `require('mason').setup{}`. It only translates between nvim-lspconfig server names and mason package names (`lua_ls` ↔ `lua-language-server`); it does **not** enable servers — `vim.lsp.enable` in the `servers` loop does that. Skipping the call is undefined behaviour in mason-lspconfig, so do not remove it even though it looks like a no-op.
 
 - **stylua is an LSP, not an external conform formatter**: upstream Section 6 lists `stylua = {}` in the `servers` table. Conform's `lsp_format = 'fallback'` then routes Lua formatting through it. Do not add stylua to conform's `formatters_by_ft`.
 
