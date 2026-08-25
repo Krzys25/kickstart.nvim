@@ -391,7 +391,6 @@ do
   -- preview installed schemes.
   vim.pack.add { gh 'olimorris/onedarkpro.nvim' }
   vim.cmd.colorscheme 'onedark'
-  vim.cmd.hi 'Comment gui=none'
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
