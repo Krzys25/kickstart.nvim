@@ -8,8 +8,9 @@ vim.opt_local.tabstop = 2
 vim.opt_local.shiftwidth = 2
 vim.opt_local.expandtab = true
 
--- Clear indentexpr so autoindent/smartindent uses the shiftwidth above
--- instead of any earlier expression-based indent.
-vim.opt_local.indentexpr = ''
+-- NOTE: don't set `indentexpr` here. init.lua Section 9 registers its FileType
+-- autocmd after the filetypeplugin one, so for any language with a treesitter
+-- indents query (yaml has one) it overwrites indentexpr right after this runs.
+-- The tabstop/shiftwidth/expandtab above still apply.
 
 vim.opt_local.commentstring = '# %s'
