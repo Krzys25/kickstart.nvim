@@ -1,6 +1,6 @@
 -- Block the stock Vim ftplugin/indent scripts for YAML from loading and
 -- overriding our settings below. guess-indent is excluded from YAML in
--- init.lua Section 3, so we don't need to fight it here.
+-- init.lua Section 4, so we don't need to fight it here.
 vim.b.did_ftplugin = 1
 vim.b.did_indent = 1
 
